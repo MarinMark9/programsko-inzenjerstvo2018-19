@@ -4,34 +4,33 @@
  */
 package fpgrowth;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 public class FPGrowth {
 
-    int threshold;
+    int threshold, column_count;
+    String querry;
     //fp-tree constructing fileds
     Vector<FPtree> headerTable;
     FPtree fptree;
     //fp-growth
     Map<String, Integer> frequentPatterns;
 
-    public FPGrowth(File file, int threshold) throws FileNotFoundException {
+    public FPGrowth(String querry, int column_count, int threshold) {
         this.threshold = threshold;
-        fptree(file);
+        this.querry = querry;
+        this.column_count = column_count;
+        fptree();
         fpgrowth(fptree, threshold, headerTable);
-        print();
-
+        print_solution();
     }
 
     private FPtree conditional_fptree_constructor(Map<String, Integer> conditionalPatternBase, Map<String, Integer> conditionalItemsMaptoFrequencies, int threshold, Vector<FPtree> conditional_headerTable) {
@@ -59,37 +58,43 @@ public class FPGrowth {
         return conditional_fptree;
     }
 
-    private void fptree(File file) throws FileNotFoundException {
+    private void fptree() {
         //preprocessing fields
         Map<String, Integer> itemsMaptoFrequencies = new HashMap<String, Integer>();
-        Scanner input = new Scanner(file);
         List<String> sortedItemsbyFrequencies = new LinkedList<String>();
         Vector<String> itemstoRemove = new Vector<String>();
-        preProcessing(file, itemsMaptoFrequencies, input, sortedItemsbyFrequencies, itemstoRemove);
-        construct_fpTree(file, itemsMaptoFrequencies, input, sortedItemsbyFrequencies, itemstoRemove);
+        preProcessing(itemsMaptoFrequencies, sortedItemsbyFrequencies, itemstoRemove);
+        construct_fpTree(itemsMaptoFrequencies, sortedItemsbyFrequencies, itemstoRemove);
 
     }
 
-    private void preProcessing(File file, Map<String, Integer> itemsMaptoFrequencies, Scanner input, List<String> sortedItemsbyFrequencies, Vector<String> itemstoRemove) throws FileNotFoundException {
-        while (input.hasNext()) {
-            String temp = input.next();
-            if (itemsMaptoFrequencies.containsKey(temp)) {
-                int count = itemsMaptoFrequencies.get(temp);
-                itemsMaptoFrequencies.put(temp, count + 1);
-            } else {
-                itemsMaptoFrequencies.put(temp, 1);
-            }
-        }
-        input.close();
-        //orderiiiiiiiiiiiiiiiiiiiiiiiiiiiing
-        //also elimating non-frequents
+    private void preProcessing(Map<String, Integer> itemsMaptoFrequencies, List<String> sortedItemsbyFrequencies, Vector<String> itemstoRemove) {
+    	//mapping frequents
+		ResultSet result = DatabaseData.getDatabaseData(this.querry);
+		try {
+			while(result.next()) {
+				for (int i = 0; i < this.column_count; i++) {
+					String temp = result.getString(i+1).replace(" ", "_").replace(",", "");
+					
+					 if (itemsMaptoFrequencies.containsKey(temp)) {
+			                int count = itemsMaptoFrequencies.get(temp);
+			                itemsMaptoFrequencies.put(temp, count + 1);
+			         } else {
+			                itemsMaptoFrequencies.put(temp, 1);
+			         }
+				}
+			}
+		} 
+		catch(Exception exc){
+			exc.printStackTrace();
+		}
+        //ordering and elimating non-frequents
 
         //for breakpoint for comparison
         sortedItemsbyFrequencies.add("null");
         itemsMaptoFrequencies.put("null", 0);
         for (String item : itemsMaptoFrequencies.keySet()) {
             int count = itemsMaptoFrequencies.get(item);
-            // System.out.println( count );
             int i = 0;
             for (String listItem : sortedItemsbyFrequencies) {
                 if (itemsMaptoFrequencies.get(listItem) < count) {
@@ -100,7 +105,6 @@ public class FPGrowth {
             }
         }
         //removing non-frequents
-        //this pichidegi is for concurrency problem in collection iterators
         for (String listItem : sortedItemsbyFrequencies) {
             if (itemsMaptoFrequencies.get(listItem) < threshold) {
                 itemstoRemove.add(listItem);
@@ -109,13 +113,10 @@ public class FPGrowth {
         for (String itemtoRemove : itemstoRemove) {
             sortedItemsbyFrequencies.remove(itemtoRemove);
         }
-        //printttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
-        //     for ( String key : list )
-        //        System.out.printf( "%-10s%10s\n", key, items.get( key ) );
 
     }
 
-    private void construct_fpTree(File file, Map<String, Integer> itemsMaptoFrequencies, Scanner input, List<String> sortedItemsbyFrequencies, Vector<String> itemstoRemove) throws FileNotFoundException {
+    private void construct_fpTree(Map<String, Integer> itemsMaptoFrequencies, List<String> sortedItemsbyFrequencies, Vector<String> itemstoRemove) {
         //HeaderTable Creation
         // first elements use just as pointers
         headerTable = new Vector<FPtree>();
@@ -123,54 +124,51 @@ public class FPGrowth {
             headerTable.add(new FPtree(itemsforTable));
         }
         //FPTree constructing
-        input = new Scanner(file);
         //the null node!
         fptree = new FPtree("null");
         fptree.item = null;
         fptree.root = true;
         //ordering frequent items transaction
-        while (input.hasNextLine()) {
-            String line = input.nextLine();
-            StringTokenizer tokenizer = new StringTokenizer(line);
-            Vector<String> transactionSortedbyFrequencies = new Vector<String>();
-            while (tokenizer.hasMoreTokens()) {
-                String item = tokenizer.nextToken();
-                if (itemstoRemove.contains(item)) {
-                    continue;
-                }
-                int index = 0;
-                for (String vectorString : transactionSortedbyFrequencies) {
-                    //some lines of condition is for alphabetically check in equals situatioans
-                    if (itemsMaptoFrequencies.get(vectorString) < itemsMaptoFrequencies.get(item) || ((itemsMaptoFrequencies.get(vectorString) == itemsMaptoFrequencies.get(item)) && (vectorString.compareToIgnoreCase(item) < 0 ? true : false))) {
-                        transactionSortedbyFrequencies.add(index, item);
-                        break;
-                    }
-                    index++;
-                }
-                if (!transactionSortedbyFrequencies.contains(item)) {
-                    transactionSortedbyFrequencies.add(item);
-                }
-            }
-            //printing transactionSortedbyFrequencies
-            /*
-            for (String vectorString : transactionSortedbyFrequencies) {
-            System.out.printf("%-10s%10s ", vectorString, itemsMaptoFrequencies.get(vectorString));
-            }
-            System.out.println();
-             *
-             */
-            //printing transactionSortedbyFrequencies
-            /*
-            for (String vectorString : transactionSortedbyFrequencies) {
-            System.out.printf("%-10s%10s ", vectorString, itemsMaptoFrequencies.get(vectorString));
-            }
-            System.out.println();
-             *
-             */
-            //adding to tree
-            insert(transactionSortedbyFrequencies, fptree, headerTable);
-            transactionSortedbyFrequencies.clear();
-        }
+        
+        ResultSet result = DatabaseData.getDatabaseData(this.querry);
+		
+		try {
+			while(result.next()) {
+				String line = "";
+				for (int i = 0; i < this.column_count; i++) {
+					line += result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+				}
+				
+				StringTokenizer tokenizer = new StringTokenizer(line);
+	            Vector<String> transactionSortedbyFrequencies = new Vector<String>();
+	            while (tokenizer.hasMoreTokens() && 1 > 0) {
+	                String item = tokenizer.nextToken();
+	                if (itemstoRemove.contains(item)) {
+	                    continue;
+	                }
+	                int index = 0;
+	                for (String vectorString : transactionSortedbyFrequencies) {
+	                    //some lines of condition is for alphabetically check in equals situatioans
+	                    if (itemsMaptoFrequencies.get(vectorString) < itemsMaptoFrequencies.get(item) || ((itemsMaptoFrequencies.get(vectorString) == itemsMaptoFrequencies.get(item)) && (vectorString.compareToIgnoreCase(item) < 0 ? true : false))) {
+	                        transactionSortedbyFrequencies.add(index, item);
+	                        break;
+	                    }
+	                    index++;
+	                }
+	                if (!transactionSortedbyFrequencies.contains(item)) {
+	                    transactionSortedbyFrequencies.add(item);
+	                }
+	            }
+
+	            //adding to tree
+	            insert(transactionSortedbyFrequencies, fptree, headerTable);
+	            transactionSortedbyFrequencies.clear();
+			}
+		} 
+		catch(Exception exc){
+			exc.printStackTrace();
+		}
+		
         //headertable reverse ordering
         //first calculating item frequencies in tree
         for (FPtree item : headerTable) {
@@ -182,9 +180,8 @@ public class FPGrowth {
             }
             item.count = count;
         }
-        Comparator c = new frequencyComparitorinHeaderTable();
+        Comparator<FPtree> c = new frequencyComparitorinHeaderTable();
         Collections.sort(headerTable, c);
-        input.close();
     }
 
     void insert(Vector<String> transactionSortedbyFrequencies, FPtree fptree, Vector<FPtree> headerTable) {
@@ -223,7 +220,6 @@ public class FPGrowth {
     private void fpgrowth(FPtree fptree, int threshold, Vector<FPtree> headerTable) {
         frequentPatterns = new HashMap<String, Integer>();
         FPgrowth(fptree, null, threshold, headerTable, frequentPatterns);
-        int i = 0;
     }
 
     void FPgrowth(FPtree fptree, String base, int threshold, Vector<FPtree> headerTable, Map<String, Integer> frequentPatterns) {
@@ -319,28 +315,12 @@ public class FPGrowth {
         insert(pattern_vector, count_of_pattern, newNode, conditional_headerTable);
     }
 
-    private void print() throws FileNotFoundException {
-        /*
-        Vector<String> sortedItems = new Vector<String>();
-        sortedItems.add("null");
-        frequentPatterns.put("null", 0);
-        for (String item : frequentPatterns.keySet()) {
-            int count = frequentPatterns.get(item);
-
-            int i = 0;
-            for (String listItem : sortedItems) {
-                if (frequentPatterns.get(listItem) < count) {
-                    sortedItems.add(i, item);
-                    break;
-                }
-                i++;
-            }
-        }
-         * 
-         */
-        Formatter output = new Formatter("a.out");
+    private void print_solution() {
         for (String frequentPattern : frequentPatterns.keySet()) {
-            output.format("%s\t%d\n", frequentPattern,frequentPatterns.get(frequentPattern));
+        	int key_len = frequentPattern.split(" ").length;
+        	if (key_len == 1) continue;
+        	
+            System.out.println(frequentPattern + " " + frequentPatterns.get(frequentPattern));
         }
     }
 }
