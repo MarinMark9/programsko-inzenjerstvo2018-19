@@ -18,16 +18,23 @@ public class FPGrowth {
 
     int threshold, column_count;
     String querry;
+    String[] header;
     //fp-tree constructing fileds
     Vector<FPtree> headerTable;
     FPtree fptree;
     //fp-growth
     Map<String, Integer> frequentPatterns;
 
-    public FPGrowth(String querry, int column_count, int threshold) {
+    public FPGrowth(String querry, int threshold, String[] header) {
         this.threshold = threshold;
         this.querry = querry;
-        this.column_count = column_count;
+        this.column_count = 3;
+        this.header = header;
+        
+        /*for (int i = 0; i < header.length; i++) {
+        	this.header[i] = header[i].replace(" ", "_");
+        }*/
+        
         fptree();
         fpgrowth(fptree, threshold, headerTable);
         print_solution();
@@ -76,12 +83,14 @@ public class FPGrowth {
 				for (int i = 0; i < this.column_count; i++) {
 					String temp = result.getString(i+1).replace(" ", "_").replace(",", "");
 					
-					 if (itemsMaptoFrequencies.containsKey(temp)) {
-			                int count = itemsMaptoFrequencies.get(temp);
-			                itemsMaptoFrequencies.put(temp, count + 1);
-			         } else {
-			                itemsMaptoFrequencies.put(temp, 1);
-			         }
+					//System.out.println(this.header[i].replace(" ", "_") + "=" + temp);
+					temp = this.header[i].replace(" ", "_") + "=" + temp;
+					if (itemsMaptoFrequencies.containsKey(temp)) {
+						int count = itemsMaptoFrequencies.get(temp);
+						itemsMaptoFrequencies.put(temp, count + 1);
+					} else {
+						itemsMaptoFrequencies.put(temp, 1);
+					}
 				}
 			}
 		} 
@@ -140,9 +149,14 @@ public class FPGrowth {
 				}
 				
 				StringTokenizer tokenizer = new StringTokenizer(line);
+				//System.out.println(line.toString());
 	            Vector<String> transactionSortedbyFrequencies = new Vector<String>();
-	            while (tokenizer.hasMoreTokens() && 1 > 0) {
+	            int tokenCount = 0;
+	            while (tokenizer.hasMoreTokens()) {
 	                String item = tokenizer.nextToken();
+	                item = this.header[tokenCount].replace(" ", "_") + "=" + item;
+	                //System.out.println(this.header[tokenCount].replace(" ", "_") + "=" + item);
+	                tokenCount++;
 	                if (itemstoRemove.contains(item)) {
 	                    continue;
 	                }
@@ -323,4 +337,5 @@ public class FPGrowth {
             System.out.println(frequentPattern + " " + frequentPatterns.get(frequentPattern));
         }
     }
+
 }
