@@ -5,6 +5,7 @@
 package fpgrowth;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,13 +32,9 @@ public class FPGrowth {
         this.column_count = 3;
         this.header = header;
         
-        /*for (int i = 0; i < header.length; i++) {
-        	this.header[i] = header[i].replace(" ", "_");
-        }*/
-        
         fptree();
         fpgrowth(fptree, threshold, headerTable);
-        print_solution();
+        //print_solution();
     }
 
     private FPtree conditional_fptree_constructor(Map<String, Integer> conditionalPatternBase, Map<String, Integer> conditionalItemsMaptoFrequencies, int threshold, Vector<FPtree> conditional_headerTable) {
@@ -336,6 +333,19 @@ public class FPGrowth {
         	
             System.out.println(frequentPattern + " " + frequentPatterns.get(frequentPattern));
         }
+    }
+    
+    public ArrayList<String> returnResult() {
+    	ArrayList<String> result = new ArrayList<String>();
+    	
+        for (String frequentPattern : frequentPatterns.keySet()) {
+        	int key_len = frequentPattern.split(" ").length;
+        	if (key_len == 1) continue;
+        	
+            result.add(frequentPattern + " " + frequentPatterns.get(frequentPattern));
+        }
+        
+        return result;
     }
 
 }
