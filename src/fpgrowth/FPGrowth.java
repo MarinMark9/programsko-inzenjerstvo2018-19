@@ -335,14 +335,16 @@ public class FPGrowth {
         }
     }
     
-    public ArrayList<String> returnResult() {
-    	ArrayList<String> result = new ArrayList<String>();
+    public ArrayList<Rule> returnResult() {
+    	ArrayList<Rule> result = new ArrayList<Rule>();
     	
         for (String frequentPattern : frequentPatterns.keySet()) {
         	int key_len = frequentPattern.split(" ").length;
         	if (key_len == 1) continue;
         	
-            result.add(frequentPattern + " " + frequentPatterns.get(frequentPattern));
+        	Rule t1 = new Rule(frequentPattern + " " + frequentPatterns.get(frequentPattern));
+        	
+            result.add(t1);
         }
         
         return result;

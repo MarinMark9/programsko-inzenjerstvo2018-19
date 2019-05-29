@@ -3,10 +3,6 @@ package fpgrowth;
 import java.sql.*;
 
 public class DatabaseData {
-
-	public static void main(String[] args) {
-		
-	}
 	
 	public static ResultSet getDatabaseData(String querry) {
 		try {
