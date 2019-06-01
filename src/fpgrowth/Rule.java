@@ -30,12 +30,16 @@ public class Rule {
 	
 	private String valuesToStr() {
 		String ret = "";
+		int cnt = 0;
+		String zarez = ",";
 		for (String key : this.values.keySet()) {
-			ret += (key + "->" + values.get(key) + "\t");
+			ret += (key + "->" + values.get(key) + zarez + "\t");
+			cnt++;
+			if (values.size()- 1 == cnt) zarez="";
 		}
 		
 		
-		return ret;
+		return "{" + ret + "}";
 	}
 
 	@Override

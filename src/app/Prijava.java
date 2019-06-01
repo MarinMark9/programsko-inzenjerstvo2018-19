@@ -1,11 +1,14 @@
 package app;
-
+import java.sql.*;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import fpgrowth.DatabaseData;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
@@ -28,11 +31,12 @@ public class Prijava extends JFrame {
 	private JPasswordField passwordField;
 	private JLabel lblLozinka;
 	private JLabel lblNeispravnaPrijava;
+	public static boolean valid = false;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -43,7 +47,7 @@ public class Prijava extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
@@ -52,6 +56,7 @@ public class Prijava extends JFrame {
 		setTitle("Prijava");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 676, 439);
+		this.setVisible(true);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -68,7 +73,7 @@ public class Prijava extends JFrame {
 		
 		JLabel lblKorisnikoIme = new JLabel("Korisni\u010Dko ime:");
 		lblKorisnikoIme.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblKorisnikoIme.setBounds(391, 61, 99, 16);
+		lblKorisnikoIme.setBounds(391, 61, 150, 20);
 		contentPane.add(lblKorisnikoIme);
 		
 		lblLozinka = new JLabel("Lozinka:");
@@ -84,17 +89,34 @@ public class Prijava extends JFrame {
 				char[] pass = passwordField.getPassword();
 				String password = new String(pass);
 						
-				if((ime.equals("admin")) && (password.equals("admin123"))) {
+				if(this.checkUser(ime, password) == 1) {
 					//ispravni podaci
 					JOptionPane.showMessageDialog(null, "Podaci su ispravni!");
 					dispose();
 					Sucelje glavno = new Sucelje();
-					glavno.setVisible(true);
+					//glavno.setVisible(true);
 				} else {
 					passwordField.setText("");
 					lblNeispravnaPrijava.setVisible(true);
-					
 				}
+				
+			}
+			private int checkUser(String ime, String password) {
+				String querry = "SELECT * FROM Users WHere UserName='" + ime + "' AND Password='" + password + "'";
+				try {
+					ResultSet res = DatabaseData.getDatabaseData(querry);
+				//	System.out.println("Korisničko ime ->" + res.getString("UserName") + "Lozinka -> "+ res.getString("Password"));
+					if(res.next()) {
+						return 1;
+						
+					} else {
+						return 0;
+					}
+				} catch(Exception e){
+					System.out.println("Nešto nije u redu");
+					return -1;
+				}
+				
 				
 			}
 		});
@@ -113,24 +135,36 @@ public class Prijava extends JFrame {
 				}
 			}
 		});
-		chckbxPrikaiLozinku.setBounds(391, 212, 113, 25);
+		chckbxPrikaiLozinku.setBounds(391, 212, 125, 30);
 		contentPane.add(chckbxPrikaiLozinku);
 		
 		lblNeispravnaPrijava = new JLabel("Neispravna prijava!");
 		lblNeispravnaPrijava.setForeground(new Color(178, 34, 34));
 		lblNeispravnaPrijava.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblNeispravnaPrijava.setBounds(428, 333, 135, 27);
+		lblNeispravnaPrijava.setBounds(428, 333, 150, 27);
 		lblNeispravnaPrijava.setVisible(false);
 		contentPane.add(lblNeispravnaPrijava);
 		
-		JLabel lblNewLabel = new JLabel("Tra\u017Eilica");
+		JLabel lblNewLabel = new JLabel("Prijava u sustav");
 		lblNewLabel.setFont(new Font("Century Gothic", Font.BOLD, 26));
-		lblNewLabel.setBounds(123, 77, 155, 76);
+		lblNewLabel.setBounds(70, 77, 250, 76);
 		contentPane.add(lblNewLabel);
 		
 		JLabel lblPretraiInformacijeO = new JLabel("Pretra\u017Ei informacije o zlo\u010Dinima ");
 		lblPretraiInformacijeO.setFont(new Font("Century Gothic", Font.PLAIN, 15));
-		lblPretraiInformacijeO.setBounds(69, 180, 231, 76);
+		lblPretraiInformacijeO.setBounds(70, 180, 250, 100);
 		contentPane.add(lblPretraiInformacijeO);
 	}
+	 
+	
+/*	public String getUserName() {
+		String ime = textField.getText();
+		return ime;
+	}
+	
+	public String getPassword() {
+		char[] pass = passwordField.getPassword();
+		String pasw = new String(pass);
+		return pasw;
+	}*/
 }
