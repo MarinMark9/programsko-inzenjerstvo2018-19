@@ -1,7 +1,4 @@
 package app;
-import java.sql.*;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,7 +22,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Prijava extends JFrame {
-
+	
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
@@ -33,25 +32,6 @@ public class Prijava extends JFrame {
 	private JLabel lblNeispravnaPrijava;
 	public static boolean valid = false;
 
-	/**
-	 * Launch the application.
-	 */
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Prijava frame = new Prijava();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
-
-	/**
-	 * Create the frame.
-	 */
 	public Prijava() {
 		setTitle("Prijava");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -89,35 +69,14 @@ public class Prijava extends JFrame {
 				char[] pass = passwordField.getPassword();
 				String password = new String(pass);
 						
-				if(this.checkUser(ime, password) == 1) {
-					//ispravni podaci
+				if(DatabaseData.checkUser(ime, password)) {
 					JOptionPane.showMessageDialog(null, "Podaci su ispravni!");
 					dispose();
-					Sucelje glavno = new Sucelje();
-					//glavno.setVisible(true);
+					new Sucelje();
 				} else {
 					passwordField.setText("");
 					lblNeispravnaPrijava.setVisible(true);
-				}
-				
-			}
-			private int checkUser(String ime, String password) {
-				String querry = "SELECT * FROM users WHere username='" + ime + "' AND password='" + password + "'";
-				try {
-					ResultSet res = DatabaseData.getDatabaseData(querry);
-				//	System.out.println("Korisničko ime ->" + res.getString("UserName") + "Lozinka -> "+ res.getString("Password"));
-					if(res.next()) {
-						return 1;
-						
-					} else {
-						return 0;
-					}
-				} catch(Exception e){
-					System.out.println("Nešto nije u redu");
-					return -1;
-				}
-				
-				
+				}	
 			}
 		});
 		btnPrijava.setForeground(SystemColor.controlDkShadow);
@@ -155,16 +114,4 @@ public class Prijava extends JFrame {
 		lblPretraiInformacijeO.setBounds(70, 180, 250, 100);
 		contentPane.add(lblPretraiInformacijeO);
 	}
-	 
-	
-/*	public String getUserName() {
-		String ime = textField.getText();
-		return ime;
-	}
-	
-	public String getPassword() {
-		char[] pass = passwordField.getPassword();
-		String pasw = new String(pass);
-		return pasw;
-	}*/
 }

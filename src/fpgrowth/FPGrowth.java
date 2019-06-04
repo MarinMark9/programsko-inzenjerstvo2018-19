@@ -20,21 +20,26 @@ public class FPGrowth {
     int threshold, column_count;
     String querry;
     String[] header;
-    //fp-tree constructing fileds
+    
     Vector<FPtree> headerTable;
     FPtree fptree;
-    //fp-growth
     Map<String, Integer> frequentPatterns;
 
     public FPGrowth(String querry, int threshold, String[] header) {
         this.threshold = threshold;
         this.querry = querry;
-        this.column_count = 3;
-        this.header = header;
+        this.header = replaceHeader(header);
+        this.column_count = this.header.length;
         
         fptree();
         fpgrowth(fptree, threshold, headerTable);
-        //print_solution();
+    }
+    
+    private String[] replaceHeader(String[] header) {
+    	for (int i = 0; i < header.length; i++) {
+    		header[i] = header[i].replace(" ", "_");
+    	}
+    	return header;
     }
 
     private FPtree conditional_fptree_constructor(Map<String, Integer> conditionalPatternBase, Map<String, Integer> conditionalItemsMaptoFrequencies, int threshold, Vector<FPtree> conditional_headerTable) {
@@ -78,10 +83,15 @@ public class FPGrowth {
 		try {
 			while(result.next()) {
 				for (int i = 0; i < this.column_count; i++) {
-					String temp = result.getString(i+1).replace(" ", "_").replace(",", "");
+					String temp = result.getString(i+1);
 					
-					//System.out.println(this.header[i].replace(" ", "_") + "=" + temp);
-					temp = this.header[i].replace(" ", "_") + "=" + temp;
+					if (this.header[i].equals("Event_Clearance_Date")) {
+						temp = temp.split(" ")[2];
+					} else {
+						temp = temp.replace(" ", "_").replace(",", "");
+					}
+
+					temp = this.header[i] + "=" + temp;
 					if (itemsMaptoFrequencies.containsKey(temp)) {
 						int count = itemsMaptoFrequencies.get(temp);
 						itemsMaptoFrequencies.put(temp, count + 1);
@@ -95,7 +105,6 @@ public class FPGrowth {
 			exc.printStackTrace();
 		}
         //ordering and elimating non-frequents
-
         //for breakpoint for comparison
         sortedItemsbyFrequencies.add("null");
         itemsMaptoFrequencies.put("null", 0);
@@ -142,17 +151,23 @@ public class FPGrowth {
 			while(result.next()) {
 				String line = "";
 				for (int i = 0; i < this.column_count; i++) {
-					line += result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+					//line += result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+					String information = "";
+					if (this.header[i].equals("Event_Clearance_Date")) {
+						String temp =  result.getString(i+1);
+						information = temp.split(" ")[2] + " ";
+					} else {
+						information = result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+					}
+					line += information;
 				}
 				
 				StringTokenizer tokenizer = new StringTokenizer(line);
-				//System.out.println(line.toString());
 	            Vector<String> transactionSortedbyFrequencies = new Vector<String>();
 	            int tokenCount = 0;
 	            while (tokenizer.hasMoreTokens()) {
 	                String item = tokenizer.nextToken();
 	                item = this.header[tokenCount].replace(" ", "_") + "=" + item;
-	                //System.out.println(this.header[tokenCount].replace(" ", "_") + "=" + item);
 	                tokenCount++;
 	                if (itemstoRemove.contains(item)) {
 	                    continue;
@@ -170,7 +185,6 @@ public class FPGrowth {
 	                    transactionSortedbyFrequencies.add(item);
 	                }
 	            }
-
 	            //adding to tree
 	            insert(transactionSortedbyFrequencies, fptree, headerTable);
 	            transactionSortedbyFrequencies.clear();
@@ -179,7 +193,6 @@ public class FPGrowth {
 		catch(Exception exc){
 			exc.printStackTrace();
 		}
-		
         //headertable reverse ordering
         //first calculating item frequencies in tree
         for (FPtree item : headerTable) {
@@ -268,8 +281,8 @@ public class FPGrowth {
                     }
                 }
             }
-            //conditional fptree
-            //HeaderTable Creation
+            // conditional fptree
+            // HeaderTable Creation
             // first elements are being used just as pointers
             // non conditional frequents also will be removed
             Vector<FPtree> conditional_headerTable = new Vector<FPtree>();
@@ -283,7 +296,7 @@ public class FPGrowth {
                 conditional_headerTable.add(f);
             }
             FPtree conditional_fptree = conditional_fptree_constructor(conditionalPatternBase, conditionalItemsMaptoFrequencies, threshold, conditional_headerTable);
-            //headertable reverse ordering
+            // headertable reverse ordering
             Collections.sort(conditional_headerTable, new frequencyComparitorinHeaderTable());
             //
             if (!conditional_fptree.children.isEmpty()) {
@@ -309,7 +322,7 @@ public class FPGrowth {
         }
         if (!ifisdone) {
             for (FPtree headerPointer : conditional_headerTable) {
-                //this if also gurantees removing og non frequets
+                // this if also gurantees removing og non frequets
                 if (headerPointer.item.equals(itemtoAddtotree)) {
                     newNode = new FPtree(itemtoAddtotree);
                     newNode.count = count_of_pattern;
@@ -324,15 +337,6 @@ public class FPGrowth {
         }
         pattern_vector.remove(0);
         insert(pattern_vector, count_of_pattern, newNode, conditional_headerTable);
-    }
-
-    private void print_solution() {
-        for (String frequentPattern : frequentPatterns.keySet()) {
-        	int key_len = frequentPattern.split(" ").length;
-        	if (key_len == 1) continue;
-        	
-            System.out.println(frequentPattern + " " + frequentPatterns.get(frequentPattern));
-        }
     }
     
     public ArrayList<Rule> returnResult() {

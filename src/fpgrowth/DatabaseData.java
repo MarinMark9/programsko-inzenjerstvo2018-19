@@ -16,5 +16,18 @@ public class DatabaseData {
 			exc.printStackTrace();
 		}
 		return null;
-	} 
+	}
+	
+	public static boolean checkUser(String ime, String password) {
+		String query = "select * from users where username='" + ime + "' AND password='" + password + "'";
+		try {
+			ResultSet res = DatabaseData.getDatabaseData(query);
+			if(res.next()) {
+				return true;
+			}
+		} catch(Exception e){
+			System.out.println("Pogresna kombinacija!" + "\n" + e);
+		}
+		return false;
+	}
 }
