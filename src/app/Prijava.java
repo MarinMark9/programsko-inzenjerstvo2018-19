@@ -102,7 +102,7 @@ public class Prijava extends JFrame {
 				
 			}
 			private int checkUser(String ime, String password) {
-				String querry = "SELECT * FROM Users WHere UserName='" + ime + "' AND Password='" + password + "'";
+				String querry = "SELECT * FROM users WHere username='" + ime + "' AND password='" + password + "'";
 				try {
 					ResultSet res = DatabaseData.getDatabaseData(querry);
 				//	System.out.println("Korisničko ime ->" + res.getString("UserName") + "Lozinka -> "+ res.getString("Password"));

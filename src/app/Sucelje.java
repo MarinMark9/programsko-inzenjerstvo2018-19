@@ -113,17 +113,21 @@ public class Sucelje extends JFrame {
 			btnTrai.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					int threshold = 2;
-					String querry = "select zona.`Zone/Beat`, a.`Event Clearance Group`, a.`Event Clearance Description` "
+					/*String query = "select zona.`Zone/Beat`, a.`Event Clearance Group`, a.`Event Clearance Description` "
 			        		+ "from zona inner join (select grupa.`Event Clearance Group`, zlocin.* from zlocin inner join grupa "
-			        		+ "where zlocin.`Event Clearance Code` = grupa.`Event Clearance Code`) as a where zona.`Hundred Block Location` = a.`Hundred Block Location`";
-			        String[] header = {"Zone/Beat", "Event Clearance Description", "At Scene Time"};
-			        ArrayList<Rule> resultRules = new FPGrowth(querry, threshold, header).returnResult();
+			        		+ "where zlocin.`Event Clearance Code` = grupa.`Event Clearance Code`) as a where zona.`Hundred Block Location` = a.`Hundred Block Location`";*/
+					String query = ("select `Zone/Beat`, `Event Clearance Group`, `Event Clearance Date` from (select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location`, `Zone/Beat` from "
+							+ "(select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location` from zlocin) as b "
+							+ "natural join (select distinct `Hundred Block Location`, `Zone/Beat` from zona) as c) as a "
+							+ "natural join (select distinct `Event Clearance Code`, `Event Clearance Group` from grupa) as d");
+			        String[] header = {"Zone/Beat", "Event Clearance Group", "Event Clearance Date"};
+			        ArrayList<Rule> resultRules = new FPGrowth(query, 50, header).returnResult();
 			        int cnt = 0;
 			        for (Rule s : resultRules) {
 			        	cnt++;
-			        	System.out.println(s.toString());
 			        	txt.append("Rule #" + cnt + '\n' + s.toString() + '\n');
 			        }
+			        System.out.println("Lines: " + cnt);
 				}
 			}); 
 	}
