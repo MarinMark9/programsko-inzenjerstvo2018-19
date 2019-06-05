@@ -342,6 +342,7 @@ public class FPGrowth {
     public ArrayList<Rule> returnResult() {
     	ArrayList<Rule> result = new ArrayList<Rule>();
     	
+    	if (frequentPatterns == null) return result;
         for (String frequentPattern : frequentPatterns.keySet()) {
         	int key_len = frequentPattern.split(" ").length;
         	if (key_len == 1) continue;

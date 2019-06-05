@@ -67,6 +67,7 @@ public class Sucelje extends JFrame {
 		this.setVisible(true);
 		btnTrai.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+		        long start = System.currentTimeMillis();
 				int threshold = 50, cnt = 0;
 				
 				String query = ("select `Zone/Beat`, `Event Clearance Group`, `Event Clearance Date` from (select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location`, `Zone/Beat` from "
@@ -81,6 +82,7 @@ public class Sucelje extends JFrame {
 		        	txt.append("Rule #" + cnt + '\n' + s.toString() + '\n');
 		        }
 		        System.out.println("Printed lines: " + cnt);
+		        System.out.println("Ending time: " + (System.currentTimeMillis() - start));
 			}
 		}); 
 	}
