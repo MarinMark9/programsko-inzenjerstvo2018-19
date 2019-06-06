@@ -5,7 +5,7 @@ import app.Prijava;
 public class Main {
 
     public static void main(String[] args) {
-        new Prijava();  
+        new Prijava(); 
     }
    
 }
