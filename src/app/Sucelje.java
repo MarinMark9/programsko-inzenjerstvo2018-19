@@ -68,13 +68,17 @@ public class Sucelje extends JFrame {
 		btnTrai.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        long start = System.currentTimeMillis();
-				int threshold = 50, cnt = 0;
+				int threshold = 1000, cnt = 0;
 				
-				String query = ("select `Zone/Beat`, `Event Clearance Group`, `Event Clearance Date` from (select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location`, `Zone/Beat` from "
+				/*String query = ("select `Zone/Beat`, `Event Clearance Group`, `Event Clearance Date` from (select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location`, `Zone/Beat` from "
 						+ "(select distinct `Event Clearance Code`, `Event Clearance Date`, `Hundred Block Location` from zlocin) as b "
 						+ "natural join (select distinct `Hundred Block Location`, `Zone/Beat` from zona) as c) as a "
 						+ "natural join (select distinct `Event Clearance Code`, `Event Clearance Group` from grupa) as d");
-		        String[] header = {"Zone/Beat", "Event Clearance Group", "Event Clearance Date"};
+		        String[] header = {"Zone/Beat", "Event Clearance Group", "Event Clearance Date"};*/
+				
+				String query = "select `Event Clearance Code`, `Event Clearance Date`, `Zone/Beat` from zlocin";
+				String[] header = {"Event Clearance Code", "Event Clearance Date", "Zone/Beat"};
+				
 		        ArrayList<Rule> resultRules = new FPGrowth(query, threshold, header).returnResult();
 		        
 		        for (Rule s : resultRules) {

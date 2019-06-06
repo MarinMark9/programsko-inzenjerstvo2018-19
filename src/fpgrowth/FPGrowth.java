@@ -85,6 +85,10 @@ public class FPGrowth {
 				for (int i = 0; i < this.column_count; i++) {
 					String temp = result.getString(i+1);
 					
+					if (temp.equals("")) {
+						temp = "empty empty empty";
+					}
+					
 					if (this.header[i].equals("Event_Clearance_Date")) {
 						temp = temp.split(" ")[2];
 					} else {
@@ -155,6 +159,11 @@ public class FPGrowth {
 					String information = "";
 					if (this.header[i].equals("Event_Clearance_Date")) {
 						String temp =  result.getString(i+1);
+						
+						if (temp.equals("")) {
+							temp = "empty empty empty";
+						}
+						
 						information = temp.split(" ")[2] + " ";
 					} else {
 						information = result.getString(i+1).replace(" ", "_").replace(",", "") + " ";

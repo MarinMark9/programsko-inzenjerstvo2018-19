@@ -19,7 +19,6 @@ public class DatabaseData {
 	}
 	
 	public static boolean checkUser(String username, String password) {
-		DatabaseData.addUser("2", "1");
 		String encryptedPassword = Encryption.encryptWithMD5(password);
 		
 		String query = "select * from users where username='" + username + "' AND password='" + encryptedPassword + "'";
