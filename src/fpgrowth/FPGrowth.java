@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import app.Time;
+
 public class FPGrowth {
 
     int threshold, column_count;
@@ -85,12 +87,13 @@ public class FPGrowth {
 				for (int i = 0; i < this.column_count; i++) {
 					String temp = result.getString(i+1);
 					
-					if (temp.equals("")) {
-						temp = "empty empty empty";
+					if (!this.header[i].equals("Event_Clearance_Date") && temp.equals("")) {
+						temp = "None";
 					}
 					
 					if (this.header[i].equals("Event_Clearance_Date")) {
-						temp = temp.split(" ")[2];
+						//temp = temp.split(" ")[2];
+						temp = Time.categorizeTime(temp);
 					} else {
 						temp = temp.replace(" ", "_").replace(",", "");
 					}
@@ -156,17 +159,17 @@ public class FPGrowth {
 				String line = "";
 				for (int i = 0; i < this.column_count; i++) {
 					//line += result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+					String temp = result.getString(i+1);
 					String information = "";
+					
+					if (!this.header[i].equals("Event_Clearance_Date") && temp.equals("")) {
+						temp = "None";
+					}
+					
 					if (this.header[i].equals("Event_Clearance_Date")) {
-						String temp =  result.getString(i+1);
-						
-						if (temp.equals("")) {
-							temp = "empty empty empty";
-						}
-						
-						information = temp.split(" ")[2] + " ";
+						information = Time.categorizeTime(temp) + " ";
 					} else {
-						information = result.getString(i+1).replace(" ", "_").replace(",", "") + " ";
+						information = temp.replace(" ", "_").replace(",", "") + " ";
 					}
 					line += information;
 				}

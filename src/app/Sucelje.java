@@ -76,8 +76,8 @@ public class Sucelje extends JFrame {
 						+ "natural join (select distinct `Event Clearance Code`, `Event Clearance Group` from grupa) as d");
 		        String[] header = {"Zone/Beat", "Event Clearance Group", "Event Clearance Date"};*/
 				
-				String query = "select `Event Clearance Code`, `Event Clearance Date`, `Zone/Beat` from zlocin";
-				String[] header = {"Event Clearance Code", "Event Clearance Date", "Zone/Beat"};
+				String query = "select `Event Clearance Description`, `Event Clearance Date`, `Zone/Beat` from zlocin";
+				String[] header = {"Event Clearance Description", "Event Clearance Date", "Zone/Beat"};
 				
 		        ArrayList<Rule> resultRules = new FPGrowth(query, threshold, header).returnResult();
 		        
