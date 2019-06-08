@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.Font;
@@ -15,6 +16,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
+import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 
 
 public class Sucelje extends JFrame {
@@ -22,6 +25,7 @@ public class Sucelje extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private JPanel contentPane;
+	private JTextField textField;
 
 	public Sucelje() {
 		setTitle("Tra\u017Eilica");
@@ -38,18 +42,62 @@ public class Sucelje extends JFrame {
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblOdaberiParametre = new JLabel("Odaberi parametre:");
-		lblOdaberiParametre.setBounds(22, 84, 150, 40);
-		panel.add(lblOdaberiParametre);
-		
 		JButton btnTrai = new JButton("Tra\u017Ei");
-		btnTrai.setBounds(33, 412, 97, 25);
+		btnTrai.setBounds(28, 329, 97, 25);
 		panel.add(btnTrai);
 		
-		JLabel lblNaslov = new JLabel("App");
+		JLabel lblNaslov = new JLabel("Rule mining");
 		lblNaslov.setFont(new Font("Century Gothic", Font.BOLD, 24));
-		lblNaslov.setBounds(51, 36, 100, 35);
+		lblNaslov.setBounds(9, 31, 165, 35);
 		panel.add(lblNaslov);
+		
+		JLabel label = new JLabel("Threshold:");
+		label.setBounds(45, 82, 86, 16);
+		panel.add(label);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(23, 106, 116, 22);
+		panel.add(textField);
+		
+		JLabel label_1 = new JLabel("Odaberi parametre:");
+		label_1.setBounds(23, 141, 150, 40);
+		panel.add(label_1);
+		
+		JCheckBox checkBox = new JCheckBox("At scene time");
+		checkBox.setBounds(8, 178, 113, 25);
+		panel.add(checkBox);
+		
+		JCheckBox checkBox_1 = new JCheckBox("Event description");
+		checkBox_1.setBounds(8, 201, 150, 25);
+		panel.add(checkBox_1);
+		
+		JCheckBox checkBox_2 = new JCheckBox("Event code");
+		checkBox_2.setBounds(8, 224, 113, 25);
+		panel.add(checkBox_2);
+		
+		JCheckBox checkBox_3 = new JCheckBox("Block location");
+		checkBox_3.setBounds(8, 247, 113, 25);
+		panel.add(checkBox_3);
+		
+		JCheckBox checkBox_4 = new JCheckBox("Initial type desc.");
+		checkBox_4.setBounds(8, 269, 150, 25);
+		panel.add(checkBox_4);
+		
+		JCheckBox checkBox_5 = new JCheckBox("Zone");
+		checkBox_5.setBounds(8, 290, 113, 25);
+		panel.add(checkBox_5);
+		
+		JButton button = new JButton("Odjava");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(null, "Uspješno ste odjavljeni!");
+				dispose();
+				new Prijava();
+			}
+		});
+		button.setBounds(34, 569, 97, 25);
+		panel.add(button);
 		JTextArea txt = new JTextArea(10, 10);
 		txt.setEditable(false);
 		

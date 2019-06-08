@@ -31,6 +31,8 @@ public class Prijava extends JFrame {
 	private JLabel lblLozinka;
 	private JLabel lblNeispravnaPrijava;
 	public static boolean valid = false;
+	private JTextField txtIme;
+	private JPasswordField pwdLozinka;
 
 	public Prijava() {
 		setTitle("Prijava");
@@ -81,7 +83,7 @@ public class Prijava extends JFrame {
 		});
 		btnPrijava.setForeground(SystemColor.controlDkShadow);
 		btnPrijava.setFont(new Font("Century Gothic", Font.BOLD, 15));
-		btnPrijava.setBounds(432, 273, 113, 32);
+		btnPrijava.setBounds(428, 279, 113, 32);
 		contentPane.add(btnPrijava);
 		
 		JCheckBox chckbxPrikaiLozinku = new JCheckBox("Prika\u017Ei lozinku");
@@ -100,18 +102,76 @@ public class Prijava extends JFrame {
 		lblNeispravnaPrijava = new JLabel("Neispravna prijava!");
 		lblNeispravnaPrijava.setForeground(new Color(178, 34, 34));
 		lblNeispravnaPrijava.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblNeispravnaPrijava.setBounds(428, 333, 150, 27);
+		lblNeispravnaPrijava.setBounds(422, 321, 150, 27);
 		lblNeispravnaPrijava.setVisible(false);
 		contentPane.add(lblNeispravnaPrijava);
 		
 		JLabel lblNewLabel = new JLabel("Prijava u sustav");
 		lblNewLabel.setFont(new Font("Century Gothic", Font.BOLD, 26));
-		lblNewLabel.setBounds(70, 77, 250, 76);
+		lblNewLabel.setBounds(70, 28, 250, 76);
 		contentPane.add(lblNewLabel);
 		
 		JLabel lblPretraiInformacijeO = new JLabel("Pretra\u017Ei informacije o zlo\u010Dinima ");
 		lblPretraiInformacijeO.setFont(new Font("Century Gothic", Font.PLAIN, 15));
-		lblPretraiInformacijeO.setBounds(70, 180, 250, 100);
+		lblPretraiInformacijeO.setBounds(57, 84, 250, 100);
 		contentPane.add(lblPretraiInformacijeO);
+		
+		
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(28, 248, 292, 120);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		panel.setVisible(false);
+		
+		JButton button = new JButton("Novi korisnik");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panel.setVisible(true);
+			}
+		});
+		button.setForeground(SystemColor.controlDkShadow);
+		button.setFont(new Font("Century Gothic", Font.BOLD, 15));
+		button.setBounds(74, 193, 197, 32);
+		contentPane.add(button);
+		
+		txtIme = new JTextField();
+		txtIme.setBounds(126, 8, 136, 22);
+		panel.add(txtIme);
+		txtIme.setColumns(10);
+		
+		pwdLozinka = new JPasswordField();
+		pwdLozinka.setBounds(126, 43, 136, 22);
+		panel.add(pwdLozinka);
+		
+		JLabel lblKorisnikoIme_1 = new JLabel("Korisni\u010Dko ime:");
+		lblKorisnikoIme_1.setBounds(12, 11, 114, 16);
+		panel.add(lblKorisnikoIme_1);
+		
+		
+		JButton btnDodaj = new JButton("Dodaj");
+		btnDodaj.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String imeNovi = txtIme.getText();
+				char[] passNovi = pwdLozinka.getPassword();
+				String passwordNovi = new String(passNovi);
+				//System.out.println(imeNovi +" "+ passNovi+" " + passwordNovi);
+				try {
+					DatabaseData.addUser(imeNovi, passwordNovi);
+					panel.setVisible(false);
+					JOptionPane.showMessageDialog(null, "Novi korisnik je napravljen!");
+				} catch(Exception f) {
+					JOptionPane.showMessageDialog(null, "Izrada novog korisnika nije uspjela.");
+				}
+				
+				
+			}
+		});
+		btnDodaj.setBounds(85, 82, 94, 25);
+		panel.add(btnDodaj);
+		
+		JLabel lblLozinka_1 = new JLabel("Lozinka:");
+		lblLozinka_1.setBounds(12, 49, 102, 16);
+		panel.add(lblLozinka_1);
 	}
 }
